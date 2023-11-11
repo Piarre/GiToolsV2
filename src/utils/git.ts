@@ -42,7 +42,7 @@ export namespace Git {
       required: false,
     })) as string[];
 
-    // execa("git", ["add", filesToAdd.join(" ")]);
+    execa("git", ["add", filesToAdd.join(" ")]);
   }
 
   export async function commit() {

@@ -55,7 +55,7 @@ export var Git;
                 }),
                 required: false,
             }));
-            // execa("git", ["add", filesToAdd.join(" ")]);
+            execa("git", ["add", filesToAdd.join(" ")]);
         });
     }
     Git.getFilesToAdd = getFilesToAdd;
