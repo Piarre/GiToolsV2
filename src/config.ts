@@ -9,6 +9,10 @@ enum AVAILABLE_COMMANDS {
   HELP = "help",
 }
 
+type COMMANDS = "add" | "commit" | "help";
+
+let commandList: COMMANDS[] = ["add", "commit", "help"];
+
 const HELP = `
 Available commands:
   - ${AVAILABLE_COMMANDS.ADD} : Add all files to the staging area
@@ -17,4 +21,4 @@ Available commands:
   - ${AVAILABLE_COMMANDS.HELP} : Display this message
 `;
 
-export { CONFIG, AVAILABLE_COMMANDS, HELP };
+export { CONFIG, AVAILABLE_COMMANDS, HELP, commandList };
