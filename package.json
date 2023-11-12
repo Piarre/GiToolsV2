@@ -14,7 +14,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "@piarre:registry": "https://registry.npmjs.org/"
+    "@piarreregistry": "https://npm.pkg.github.com/"
   },
   "scripts": {
     "dev": "tsc -w",
