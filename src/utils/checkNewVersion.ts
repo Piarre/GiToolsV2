@@ -13,3 +13,4 @@ export default async function chechForNewVersion() {
     outro(chalk.green(`Update by running: npm i -g gitools@${remoteVersion}`));
   }
 }
+
