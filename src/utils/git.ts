@@ -5,7 +5,10 @@ import { cancel, confirm, intro, isCancel, multiselect, outro, spinner, text } f
 import { Cancel } from "./clacks.js";
 
 namespace Git {
-  export async function init() {
+  /**
+   * Initializes a new Git repository.
+   */
+  export async function init(): Promise<void> {
     intro("New Git repository");
     const remoteUrl = (await text({
       message: "Remote url",
@@ -34,7 +37,10 @@ namespace Git {
     await execa("git", ["remote", "add", "origin", remoteUrl]);
   }
 
-  export async function checkForRepository() {
+  /**
+   * Checks if the current directory is a git repository. If not, prompts the user to create a new repository.
+   */
+  export async function checkForRepository(): Promise<void> {
     const repoExists = await existsSync(".git");
     if (!repoExists) {
       const repoSpinner = spinner();
@@ -56,8 +62,19 @@ namespace Git {
     return;
   }
 
-  export async function getFilesToAdd() {
+  /**
+   * Adds modified files to the git index.
+   * @param all - If true, adds all modified files. If false, prompts the user to select which files to add.
+   */
+  export async function add(all?: boolean): Promise<void> {
     const { stdout } = await execa("git", ["ls-files", "-m", "--other", "--exclude-standard"]);
+
+    if (all) {
+      intro("Adding files...");
+      await execa("git", ["add", "."]);
+      outro(`Added ${stdout.split("\n").length} files.`);
+      process.exit(0);
+    }
 
     intro(chalk.green("Some files have been modified."));
 
@@ -88,7 +105,10 @@ namespace Git {
     }
   }
 
-  export async function commit() {
+  /**
+   * Commits changes to the git repository.
+   */
+  export async function commit(): Promise<void> {
     var desc = "";
     intro("git commit");
     const commitMsg = (await text({

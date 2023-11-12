@@ -1,10 +1,23 @@
-import { Command, createCommand } from "commander";
+import { Command } from "commander";
 import Git from "./utils/git.js";
+import chechForNewVersion from "./utils/checkNewVersion.js";
 
-const program = new Command();
-program.version("1.0.0");
+export const gitools = new Command();
+gitools.version("1.0.0");
 
-program.command("add").action(() => Git.getFilesToAdd());
-program.command("commit").action(() => Git.commit());
+gitools
+  .command("add")
+  // .option("-a, --all <boolean>", "Add all files", false)
+  // .action((_, option) => Git.add(option ? true : false))
+  .action(() => Git.add())
+  // .action((option) => console.log(option.all))
+  .description("Add files to git");
+gitools
+  .command("commit")
+  .action(() => Git.commit())
+  .description("Commit to remote repository");
 
-program.parse(process.argv);
+(async () => {
+  await chechForNewVersion();
+  gitools.parse(process.argv);
+})();
