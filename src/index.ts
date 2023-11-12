@@ -3,7 +3,7 @@ import Git from "./utils/git.js";
 import chechForNewVersion from "./utils/checkNewVersion.js";
 
 export const gitools = new Command();
-gitools.version("1.0.0");
+gitools.version("1.0.2");
 
 gitools
   .command("add")
@@ -17,7 +17,13 @@ gitools
   .action(() => Git.commit())
   .description("Commit to remote repository");
 
+gitools
+  .command("push")
+  .action(() => Git.push())
+  .description("Push to remote repository");
+
 (async () => {
   await chechForNewVersion();
+  console.clear();
   gitools.parse(process.argv);
 })();

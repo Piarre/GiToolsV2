@@ -9,7 +9,7 @@ namespace Git {
    * Initializes a new Git repository.
    */
   export async function init(): Promise<void> {
-    intro("New Git repository");
+    intro(chalk.hex("#ff8c00")("New Git repository"));
     const remoteUrl = (await text({
       message: "Remote url",
       placeholder: "https://github.com/USERNAME/REPO",
@@ -71,13 +71,13 @@ namespace Git {
     const { stdout } = await execa("git", ["ls-files", "-m", "--other", "--exclude-standard"]);
 
     if (all) {
-      intro("Adding files...");
+      intro(chalk.hex("#ff8c00")("GiTools Add"));
       await execa("git", ["add", "."]);
       outro(`Added ${stdout.split("\n").length} files.`);
       process.exit(0);
     }
 
-    intro(chalk.green("Some files have been modified."));
+    intro(chalk.hex("#ff8c00")("GiTools Add"));
 
     if (stdout.length == 0) {
       cancel("No files to add.");
@@ -112,7 +112,7 @@ namespace Git {
   export async function commit(): Promise<void> {
     checkForRepository();
     var desc = "";
-    intro("git commit");
+    intro(chalk.hex("#ff8c00")("GiTools Commit"));
     const commitMsg = (await text({
       message: "Commit message",
       placeholder: "Enter commit message",
@@ -141,6 +141,31 @@ namespace Git {
 
     await execa("git", ["commit", "-m", commitMsg]);
     outro(`Commited with message: ${commitMsg}`);
+  }
+
+  export async function push() {
+    checkForRepository();
+    intro(chalk.hex("#ff8c00")("GiTools Push"));
+    const s = spinner();
+    const branch = (await execa("git", ["branch", "--show-current"])).stdout;
+    const remote = (await execa("git", ["remote"])).stdout;
+    const remoteUrl = (await execa("git", ["remote", "get-url", remote])).stdout;
+    const push = await confirm({
+      message: `Push to ${remoteUrl} on branch ${branch}?`,
+    });
+
+    Cancel(push);
+
+    if (push) {
+      s.start("Pushing...");
+      const { stdout } = await execa("git", ["push", "-u", remote, branch]);
+      s.stop("Done");
+      outro(stdout);
+      process.exit(0);
+    } else {
+      outro(chalk.red("Exited"));
+      process.exit(0);
+    }
   }
 }
 

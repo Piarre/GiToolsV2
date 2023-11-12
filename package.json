@@ -1,6 +1,6 @@
 {
   "name": "@piarre/gitools",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "out/index.js",
   "description": "",
   "type": "module",
