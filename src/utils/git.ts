@@ -67,6 +67,7 @@ namespace Git {
    * @param all - If true, adds all modified files. If false, prompts the user to select which files to add.
    */
   export async function add(all?: boolean): Promise<void> {
+    checkForRepository();
     const { stdout } = await execa("git", ["ls-files", "-m", "--other", "--exclude-standard"]);
 
     if (all) {
@@ -109,6 +110,7 @@ namespace Git {
    * Commits changes to the git repository.
    */
   export async function commit(): Promise<void> {
+    checkForRepository();
     var desc = "";
     intro("git commit");
     const commitMsg = (await text({
