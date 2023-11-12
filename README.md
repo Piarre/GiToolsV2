@@ -23,9 +23,9 @@ gt [COMMAND]
 
 ## ⚙️ Options
 
-add [OPTIONS]
-commit
+- add [OPTIONS]
+- commit
 
 # 🔐 License
 
-[MIT]
+MIT

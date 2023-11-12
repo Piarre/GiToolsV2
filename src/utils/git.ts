@@ -129,14 +129,16 @@ namespace Git {
         message: "Description",
         placeholder: "Enter description",
       })) as string;
-      console.log(desc);
+
+      await execa("git", ["commit", "-m", commitMsg, "-m", desc]);
+      outro(`Commited with message: ${commitMsg}`);
+      process.exit(0);
     }
 
     Cancel(desc);
 
-    execa("git", ["commit", "-m", commitMsg, descNeeded ? "-m" : "", descNeeded ? desc : ""]);
+    await execa("git", ["commit", "-m", commitMsg]);
     outro(`Commited with message: ${commitMsg}`);
-    console.log(commitMsg);
   }
 }
 
