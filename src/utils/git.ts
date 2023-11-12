@@ -1,9 +1,10 @@
 import { execa } from "execa";
 import chalk from "chalk";
 import { existsSync } from "fs";
-import { cancel, confirm, intro, multiselect, outro, spinner, text } from "@clack/prompts";
+import { cancel, confirm, intro, isCancel, multiselect, outro, spinner, text } from "@clack/prompts";
+import { Cancel } from "./clacks.js";
 
-export namespace Git {
+namespace Git {
   export async function init() {
     intro("New Git repository");
     const remoteUrl = (await text({
@@ -11,15 +12,21 @@ export namespace Git {
       placeholder: "https://github.com/USERNAME/REPO",
     })) as string;
 
+    Cancel(remoteUrl);
+
     const changedBranchName = await confirm({
       message: "By default, the branch is named main, do you want to change it?",
     });
+
+    Cancel(changedBranchName);
 
     if (changedBranchName) {
       const branchName = (await text({
         message: "Branch name",
         placeholder: "main",
       })) as string;
+
+      Cancel(branchName);
 
       await execa("git", ["init", "-b", branchName]);
     }
@@ -67,11 +74,16 @@ export namespace Git {
       required: false,
     })) as string[];
 
+    if (isCancel(filesToAdd)) {
+      outro(chalk.red("Exited"));
+      process.exit(0);
+    }
+
     if (filesToAdd.includes("All")) {
       await execa("git", ["add", "."]);
-      outro(`Added ${filesToAdd.length} files.`);
+      outro(`Added ${files.length} files.`);
     } else {
-      filesToAdd.forEach(async (file) => await execa("git", ["add", file]));
+      await execa("git", ["add", ...filesToAdd]);
       outro(`Added ${filesToAdd.length} files.`);
     }
   }
@@ -84,9 +96,13 @@ export namespace Git {
       placeholder: "Enter commit message",
     })) as string;
 
+    Cancel(commitMsg);
+
     const descNeeded = await confirm({
       message: "Do you want to add a description?",
     });
+
+    Cancel(descNeeded);
 
     if (descNeeded) {
       desc = (await text({
@@ -96,8 +112,12 @@ export namespace Git {
       console.log(desc);
     }
 
+    Cancel(desc);
+
     execa("git", ["commit", "-m", commitMsg, descNeeded ? "-m" : "", descNeeded ? desc : ""]);
     outro(`Commited with message: ${commitMsg}`);
     console.log(commitMsg);
   }
 }
+
+export default Git;
