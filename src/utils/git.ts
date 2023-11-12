@@ -118,6 +118,11 @@ namespace Git {
       placeholder: "Enter commit message",
     })) as string;
 
+    if (commitMsg.length > 72) {
+      outro(chalk.red("Message too long (only 72 characters allowed)"));
+      process.exit(0);
+    }
+
     Cancel(commitMsg);
 
     const descNeeded = await confirm({
