@@ -6,10 +6,16 @@ export const gitools = new Command();
 gitools.version("1.0.2");
 
 gitools
+  .command("init")
+  .alias("i")
+  .action(async () => await Git.init())
+  .description("Initialize a new Git repository");
+
+gitools
   .command("add")
-  // .option("-a, --all <boolean>", "Add all files", false)
-  // .action((_, option) => Git.add(option ? true : false))
-  .action(() => Git.add())
+  .option<boolean>("-a, --all", "Add all files", () => false)
+  .action((option) => Git.add(option ? true : false))
+  // .action(() => Git.add())
   // .action((option) => console.log(option.all))
   .description("Add files to git");
 gitools
