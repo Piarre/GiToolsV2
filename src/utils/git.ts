@@ -12,7 +12,7 @@ namespace Git {
    * Initializes a new Git repository.
    */
   export async function init(): Promise<void> {
-    let remoteUrl: string;
+    let remoteUrl: string = "";
     intro(chalk.hex("#ff8c00")("New Git repository"));
 
     const doHaveARemoteURL = (await confirm({
