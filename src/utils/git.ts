@@ -3,19 +3,68 @@ import chalk from "chalk";
 import { existsSync } from "fs";
 import { cancel, confirm, intro, isCancel, multiselect, outro, spinner, text } from "@clack/prompts";
 import { Cancel } from "./clacks.js";
+import randomNameGenerator from "@good-ghosting/random-name-generator";
+
+import { apps, openApp } from "open";
 
 namespace Git {
   /**
    * Initializes a new Git repository.
    */
   export async function init(): Promise<void> {
+    let remoteUrl: string;
     intro(chalk.hex("#ff8c00")("New Git repository"));
-    const remoteUrl = (await text({
-      message: "Remote url",
-      placeholder: "https://github.com/USERNAME/REPO",
-    })) as string;
 
-    Cancel(remoteUrl);
+    const doHaveARemoteURL = (await confirm({
+      message: "Do you already have a remote URL ?",
+      initialValue: true,
+    })) as boolean;
+
+    Cancel(doHaveARemoteURL);
+
+    if (!doHaveARemoteURL) {
+      const generatedName = randomNameGenerator({
+        number: false,
+        words: 3,
+      }).dashed;
+
+      let newRepositoryName = (await text({
+        message: "",
+        placeholder: `Random repository name : ${generatedName}`,
+      })) as string;
+
+      if (!newRepositoryName) newRepositoryName = generatedName;
+
+      Cancel(newRepositoryName);
+
+      const description = (await text({
+        message: "Description",
+        placeholder: "Enter description",
+      })) as string;
+
+      Cancel(description);
+
+      await openApp(apps.chrome, {
+        arguments: [
+          `https://github.com/new?name=${newRepositoryName}${
+            description ? `&description=${description}` : ""
+          }`,
+        ],
+      });
+
+      remoteUrl = `https://github.com/new?name=${newRepositoryName}${
+        description ? `&description=${description}` : ""
+      }`;
+    }
+
+    if (doHaveARemoteURL) {
+      remoteUrl = (await text({
+        message: "Remote url",
+        placeholder: "https://github.com/USERNAME/REPO",
+      })) as string;
+      
+      Cancel(remoteUrl);
+    }
 
     const changedBranchName = await confirm({
       message: "By default, the branch is named main, do you want to change it?",
