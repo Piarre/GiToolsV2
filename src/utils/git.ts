@@ -12,59 +12,14 @@ namespace Git {
    * Initializes a new Git repository.
    */
   export async function init(): Promise<void> {
-    let remoteUrl: string = "";
     intro(chalk.hex("#ff8c00")("New Git repository"));
 
-    const doHaveARemoteURL = (await confirm({
-      message: "Do you already have a remote URL ?",
-      initialValue: true,
-    })) as boolean;
+    const remoteUrl = (await text({
+      message: "Remote url",
+      placeholder: "https://github.com/USERNAME/REPO",
+    })) as string;
 
-    Cancel(doHaveARemoteURL);
-
-    if (!doHaveARemoteURL) {
-      const generatedName = randomNameGenerator({
-        number: false,
-        words: 3,
-      }).dashed;
-
-      let newRepositoryName = (await text({
-        message: "",
-        placeholder: `Random repository name : ${generatedName}`,
-      })) as string;
-
-      if (!newRepositoryName) newRepositoryName = generatedName;
-
-      Cancel(newRepositoryName);
-
-      const description = (await text({
-        message: "Description",
-        placeholder: "Enter description",
-      })) as string;
-
-      Cancel(description);
-
-      await openApp(apps.chrome, {
-        arguments: [
-          `https://github.com/new?name=${newRepositoryName}${
-            description ? `&description=${description}` : ""
-          }`,
-        ],
-      });
-
-      remoteUrl = `https://github.com/new?name=${newRepositoryName}${
-        description ? `&description=${description}` : ""
-      }`;
-    }
-
-    if (doHaveARemoteURL) {
-      remoteUrl = (await text({
-        message: "Remote url",
-        placeholder: "https://github.com/USERNAME/REPO",
-      })) as string;
-      
-      Cancel(remoteUrl);
-    }
+    Cancel(remoteUrl);
 
     const changedBranchName = await confirm({
       message: "By default, the branch is named main, do you want to change it?",
@@ -199,8 +154,12 @@ namespace Git {
 
   export async function push() {
     checkForRepository();
-    intro(chalk.hex("#ff8c00")("GiTools Push"));
     const s = spinner();
+    
+    intro(chalk.hex("#ff8c00")("GiTools Push"));
+    // check if we can commit
+    const { stdout } = await execa("git", ["status", "--porcelain"]);
+    
     const branch = (await execa("git", ["branch", "--show-current"])).stdout;
     const remote = (await execa("git", ["remote"])).stdout;
     const remoteUrl = (await execa("git", ["remote", "get-url", remote])).stdout;

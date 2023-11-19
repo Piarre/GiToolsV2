@@ -1,6 +1,6 @@
 {
   "name": "@piarre/gitools",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "out/index.js",
   "description": "",
   "type": "module",
@@ -22,7 +22,8 @@
     "build": "node build/index.js",
     "start": "tsc && node .",
     "start:rm": "rm -rf out && tsc && node .",
-    "version": "tsc && node out/src/utils/checkNewVersion.js"
+    "version": "tsc && node out/src/utils/checkNewVersion.js",
+    "publish": "npm run build && npm publish"
   },
   "keywords": [],
   "author": "Piarre",
