@@ -37,7 +37,7 @@ namespace Git {
 
       await execa("git", ["init", "-b", branchName]);
     }
-
+    await execa("git", ["init"]);
     await execa("git", ["remote", "add", "origin", remoteUrl]);
   }
 
@@ -73,6 +73,7 @@ namespace Git {
   export async function add(all?: boolean): Promise<void> {
     checkForRepository();
     const { stdout } = await execa("git", ["ls-files", "-m", "--other", "--exclude-standard"]);
+    const s = spinner();
 
     if (all) {
       intro(chalk.hex("#ff8c00")("GiTools Add"));
@@ -102,10 +103,14 @@ namespace Git {
     }
 
     if (filesToAdd.includes("All")) {
+      s.start("Adding all files...")
       await execa("git", ["add", "."]);
+      s.stop()
       outro(`Added ${files.length} files.`);
     } else {
+      s.start("Adding files...")
       await execa("git", ["add", ...filesToAdd]);
+      s.stop()
       outro(`Added ${filesToAdd.length} files.`);
     }
   }
@@ -116,6 +121,13 @@ namespace Git {
   export async function commit(): Promise<void> {
     checkForRepository();
     var desc = "";
+
+    // Check if we can commit files
+    const { stdout } = await execa("git", ["status", "--porcelain"]);
+    if (stdout.length == 0) {
+      Cancel("No files to commit.");
+      process.exit(0);
+    }
     intro(chalk.hex("#ff8c00")("GiTools Commit"));
     const commitMsg = (await text({
       message: "Commit message",
@@ -155,11 +167,7 @@ namespace Git {
   export async function push() {
     checkForRepository();
     const s = spinner();
-    
     intro(chalk.hex("#ff8c00")("GiTools Push"));
-    // check if we can commit
-    const { stdout } = await execa("git", ["status", "--porcelain"]);
-    
     const branch = (await execa("git", ["branch", "--show-current"])).stdout;
     const remote = (await execa("git", ["remote"])).stdout;
     const remoteUrl = (await execa("git", ["remote", "get-url", remote])).stdout;
