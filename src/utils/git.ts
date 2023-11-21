@@ -2,7 +2,7 @@ import { execa } from "execa";
 import chalk from "chalk";
 import { existsSync } from "fs";
 import { cancel, confirm, intro, isCancel, multiselect, outro, spinner, text } from "@clack/prompts";
-import { Cancel } from "./clacks.js";
+import { Cancel, message } from "./clacks.js";
 import randomNameGenerator from "@good-ghosting/random-name-generator";
 
 import { apps, openApp } from "open";
@@ -76,13 +76,13 @@ namespace Git {
     const s = spinner();
 
     if (all) {
-      intro(chalk.hex("#ff8c00")("GiTools Add"));
+      intro(message("GiTools Add"));
       await execa("git", ["add", "."]);
       outro(`Added ${stdout.split("\n").length} files.`);
       process.exit(0);
     }
 
-    intro(chalk.hex("#ff8c00")("GiTools Add"));
+    intro(message("GiTools Add"));
 
     if (stdout.length == 0) {
       cancel("No files to add.");
@@ -128,11 +128,16 @@ namespace Git {
       Cancel("No files to commit.");
       process.exit(0);
     }
-    intro(chalk.hex("#ff8c00")("GiTools Commit"));
+    intro(message("GiTools Commit"));
     const commitMsg = (await text({
       message: "Commit message",
       placeholder: "Enter commit message",
     })) as string;
+
+    if (commitMsg == "") {
+      Cancel("Commit message cannot be empty.");
+      process.exit(0);
+    }
 
     if (commitMsg.length > 72) {
       outro(chalk.red("Message too long (only 72 characters allowed)"));
@@ -160,14 +165,20 @@ namespace Git {
 
     Cancel(desc);
 
-    await execa("git", ["commit", "-m", commitMsg]);
+    if (desc == "") {
+      await execa("git", ["commit", "-m", commitMsg]);
+      outro(`Commited with message: ${commitMsg}`);
+      process.exit(0);
+    }
+
+    await execa("git", ["commit", "-m", commitMsg, "-m", desc]);
     outro(`Commited with message: ${commitMsg}`);
   }
 
   export async function push() {
     checkForRepository();
     const s = spinner();
-    intro(chalk.hex("#ff8c00")("GiTools Push"));
+    intro(message("GiTools Push"));
     const branch = (await execa("git", ["branch", "--show-current"])).stdout;
     const remote = (await execa("git", ["remote"])).stdout;
     const remoteUrl = (await execa("git", ["remote", "get-url", remote])).stdout;

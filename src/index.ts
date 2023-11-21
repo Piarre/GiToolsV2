@@ -13,10 +13,10 @@ gitools
 
 gitools
   .command("add")
-  .option<boolean>("-a, --all", "Add all files", () => false)
-  .action((option) => Git.add(option ? true : false))
+  .option("-a, --all", "Add all files")
+  .action((option) => Git.add(option.all))
   // .action(() => Git.add())
-  // .action((option) => console.log(option.all))
+  // .action((option) => console.log(option))
   .description("Add files to git");
 gitools
   .command("commit")
